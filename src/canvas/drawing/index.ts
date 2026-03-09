@@ -34,12 +34,11 @@ export class DrawingCanvas {
     this.getScale = getScale;
   }
 
-  private createFilter(): Filter {
+  private getFilter(): Filter {
     const blur = Math.max(0, this.blur);
     const brightnessRange = Math.max(0, this.brightnessRange);
     const brightnessFactor =
       brightnessRange === 0 ? 1 : 1 + (Math.random() * 2 - 1) * brightnessRange;
-
     return {
       blur,
       brightnessFactor,
@@ -74,31 +73,44 @@ export class DrawingCanvas {
     };
   }
 
-  private drawPath(path: Path, scale: number): void {
-    if (path.points.length === 0) {
-      return;
-    }
-
+  private applyPathSettings(path: Path, scale: number): void {
     this.ctx.lineWidth = path.lineWidth * scale;
     this.ctx.lineCap = path.lineCap;
     this.ctx.strokeStyle = path.strokeStyle;
     this.ctx.filter = `blur(${path.filter.blur * scale}px) brightness(${path.filter.brightnessFactor})`;
+  }
+
+  private resetSettings(): void {
+    this.ctx.filter = "none";
+  }
+
+  private renderActiveLine(scale: number): void {
+    if (!this.activePath || this.activePath.points.length === 0) {
+      return;
+    }
+
+    this.applyPathSettings(this.activePath, scale);
 
     this.ctx.beginPath();
-    const firstPoint = this.toCanvasPoint(path.points[0], scale);
-    this.ctx.moveTo(firstPoint.x, firstPoint.y);
 
-    for (let i = 1; i < path.points.length; i += 1) {
-      const point = this.toCanvasPoint(path.points[i], scale);
-      this.ctx.lineTo(point.x, point.y);
-    }
+    const lastIndex = this.activePath.points.length - 1;
 
-    if (path.points.length === 1) {
-      this.ctx.lineTo(firstPoint.x, firstPoint.y);
-    }
+    const fromPoint = this.toCanvasPoint(
+      this.activePath.points[lastIndex - 1] ||
+        this.activePath.points[lastIndex],
+      scale,
+    );
+    const toPoint = this.toCanvasPoint(
+      this.activePath.points[lastIndex],
+      scale,
+    );
+
+    this.ctx.moveTo(fromPoint.x, fromPoint.y);
+    this.ctx.lineTo(toPoint.x, toPoint.y);
 
     this.ctx.stroke();
-    this.ctx.filter = "none";
+
+    this.resetSettings();
   }
 
   public render(): void {
@@ -111,22 +123,29 @@ export class DrawingCanvas {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     for (const path of this.paths) {
-      this.drawPath(path, scale);
+      if (path.points.length === 0) {
+        continue;
+      }
+
+      this.applyPathSettings(path, scale);
+
+      this.ctx.beginPath();
+
+      for (let i = 1; i < path.points.length; i += 1) {
+        const fromPoint = this.toCanvasPoint(
+          path.points[i - 1] || path.points[i],
+          scale,
+        );
+        const toPoint = this.toCanvasPoint(path.points[i], scale);
+
+        this.ctx.moveTo(fromPoint.x, fromPoint.y);
+        this.ctx.lineTo(toPoint.x, toPoint.y);
+      }
+
+      this.ctx.stroke();
+
+      this.resetSettings();
     }
-  }
-
-  public renderActivePath(): void {
-    const scale = this.getScale();
-
-    if (!scale) {
-      return;
-    }
-
-    if (!this.activePath) {
-      return;
-    }
-
-    this.drawPath(this.activePath, scale);
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
@@ -137,20 +156,22 @@ export class DrawingCanvas {
     }
 
     const canvasPoint = this.getCanvasPoint(event);
-
-    this.isPainting = true;
     const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
 
-    this.activePath = {
+    this.isPainting = true;
+
+    const createdPath: Path = {
       points: [logicalPoint],
       lineWidth: this.width,
       strokeStyle: this.color,
       lineCap: this.cap,
-      filter: this.createFilter(),
+      filter: this.getFilter(),
     };
 
-    this.paths.push(this.activePath);
-    this.renderActivePath();
+    this.activePath = createdPath;
+    this.paths.push(createdPath);
+
+    this.renderActiveLine(scale);
   };
 
   private handlePointerUp = (): void => {
@@ -170,11 +191,11 @@ export class DrawingCanvas {
     }
 
     const canvasPoint = this.getCanvasPoint(event);
-
     const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
 
     this.activePath.points.push(logicalPoint);
-    this.renderActivePath();
+
+    this.renderActiveLine(scale);
   };
 
   public init(): void {

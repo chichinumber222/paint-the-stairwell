@@ -1,8 +1,3 @@
-export type Point = {
-  x: number;
-  y: number;
-};
-
 export type DrawingCanvasOptions = {
   width: number;
   color: string;
@@ -11,15 +6,20 @@ export type DrawingCanvasOptions = {
   blur: number;
 };
 
-export type Filter = {
-  blur: number;
-  brightnessFactor: number;
-};
-
 export type Path = {
   points: Point[];
   lineWidth: number;
   strokeStyle: string;
   lineCap: CanvasLineCap;
   filter: Filter;
+};
+
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export type Filter = {
+  blur: number;
+  brightnessFactor: number;
 };
