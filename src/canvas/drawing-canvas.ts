@@ -60,79 +60,84 @@ export class DrawingCanvas {
     };
   }
 
-  private toLogicalPoint(point: Point): Point {
-    const scale = this.getScale();
-
-    if (!scale) {
-      return point;
-    }
-
+  private toLogicalPoint(point: Point, scale: number): Point {
     return {
       x: point.x / scale,
       y: point.y / scale,
     };
   }
 
-  private toCanvasPoint(point: Point): Point {
-    const scale = this.getScale();
-
-    if (!scale) {
-      return point;
-    }
-
+  private toCanvasPoint(point: Point, scale: number): Point {
     return {
       x: point.x * scale,
       y: point.y * scale,
     };
   }
 
-  private drawPaths(): void {
+  private drawPath(path: StrokePath, scale: number): void {
+    if (path.points.length === 0) {
+      return;
+    }
+
+    this.ctx.lineWidth = path.lineWidth * scale;
+    this.ctx.lineCap = path.lineCap;
+    this.ctx.strokeStyle = path.strokeStyle;
+
+    this.ctx.beginPath();
+    const firstPoint = this.toCanvasPoint(path.points[0], scale);
+    this.ctx.moveTo(firstPoint.x, firstPoint.y);
+
+    for (let i = 1; i < path.points.length; i += 1) {
+      const point = this.toCanvasPoint(path.points[i], scale);
+      this.ctx.lineTo(point.x, point.y);
+    }
+
+    if (path.points.length === 1) {
+      this.ctx.lineTo(firstPoint.x, firstPoint.y);
+    }
+
+    this.ctx.stroke();
+  }
+
+  public render(): void {
     const scale = this.getScale();
 
     if (!scale) {
       return;
     }
 
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     for (const path of this.paths) {
-      if (path.points.length === 0) {
-        continue;
-      }
-
-      this.ctx.beginPath();
-      this.ctx.lineWidth = path.lineWidth * scale;
-      this.ctx.lineCap = path.lineCap;
-      this.ctx.strokeStyle = path.strokeStyle;
-
-      const firstPoint = this.toCanvasPoint(path.points[0]);
-      this.ctx.moveTo(firstPoint.x, firstPoint.y);
-
-      for (let i = 1; i < path.points.length; i += 1) {
-        const point = this.toCanvasPoint(path.points[i]);
-        this.ctx.lineTo(point.x, point.y);
-      }
-
-      if (path.points.length === 1) {
-        this.ctx.lineTo(firstPoint.x, firstPoint.y);
-      }
-
-      this.ctx.stroke();
+      this.drawPath(path, scale);
     }
   }
 
-  public render(): void {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawPaths();
+  public renderActivePath(): void {
+    const scale = this.getScale();
+
+    if (!scale) {
+      return;
+    }
+
+    if (!this.activePath) {
+      return;
+    }
+
+    this.drawPath(this.activePath, scale);
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
-    if (!this.getScale()) {
+    const scale = this.getScale();
+
+    if (!scale) {
       return;
     }
 
     const canvasPoint = this.getCanvasPoint(event);
 
     this.isPainting = true;
-    const logicalPoint = this.toLogicalPoint(canvasPoint);
+    const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
 
     this.activePath = {
       points: [logicalPoint],
@@ -142,7 +147,7 @@ export class DrawingCanvas {
     };
 
     this.paths.push(this.activePath);
-    this.render();
+    this.renderActivePath();
   };
 
   private handlePointerUp = (): void => {
@@ -151,16 +156,22 @@ export class DrawingCanvas {
   };
 
   private handlePointerMove = (event: PointerEvent): void => {
-    if (!this.getScale() || !this.isPainting || !this.activePath) {
+    if (!this.isPainting || !this.activePath) {
+      return;
+    }
+
+    const scale = this.getScale();
+
+    if (!scale) {
       return;
     }
 
     const canvasPoint = this.getCanvasPoint(event);
 
-    const logicalPoint = this.toLogicalPoint(canvasPoint);
+    const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
 
     this.activePath.points.push(logicalPoint);
-    this.render();
+    this.renderActivePath();
   };
 
   public init(): void {
