@@ -1,36 +1,22 @@
-export type Point = {
-  x: number;
-  y: number;
-};
-
-export type DrawingCanvasOptions = {
-  lineWidth?: number;
-  strokeStyle?: string;
-  lineCap?: CanvasLineCap;
-};
-
-type StrokePath = {
-  points: Point[];
-  lineWidth: number;
-  strokeStyle: string;
-  lineCap: CanvasLineCap;
-};
+import type { DrawingCanvasOptions, Filter, Path, Point } from "./types";
 
 export class DrawingCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private lineWidth: number;
-  private lineCap: CanvasLineCap;
-  private strokeStyle: string;
+  private width: number;
+  private cap: CanvasLineCap;
+  private color: string;
+  private brightnessRange: number;
+  private blur: number;
   private getScale: () => number | null;
-  private paths: StrokePath[] = [];
-  private activePath: StrokePath | null = null;
+  private paths: Path[] = [];
+  private activePath: Path | null = null;
   private isPainting = false;
 
   public constructor(
     canvas: HTMLCanvasElement,
     getScale: () => number | null,
-    options: DrawingCanvasOptions = {},
+    options: DrawingCanvasOptions,
   ) {
     const context = canvas.getContext("2d");
 
@@ -40,10 +26,24 @@ export class DrawingCanvas {
 
     this.canvas = canvas;
     this.ctx = context;
-    this.lineCap = options.lineCap ?? "round";
-    this.lineWidth = options.lineWidth ?? 5;
-    this.strokeStyle = options.strokeStyle ?? "green";
+    this.cap = options.cap;
+    this.width = options.width;
+    this.color = options.color;
+    this.brightnessRange = options.brightnessRange;
+    this.blur = options.blur;
     this.getScale = getScale;
+  }
+
+  private createFilter(): Filter {
+    const blur = Math.max(0, this.blur);
+    const brightnessRange = Math.max(0, this.brightnessRange);
+    const brightnessFactor =
+      brightnessRange === 0 ? 1 : 1 + (Math.random() * 2 - 1) * brightnessRange;
+
+    return {
+      blur,
+      brightnessFactor,
+    };
   }
 
   public setCanvasSize(width: number, height: number): void {
@@ -74,7 +74,7 @@ export class DrawingCanvas {
     };
   }
 
-  private drawPath(path: StrokePath, scale: number): void {
+  private drawPath(path: Path, scale: number): void {
     if (path.points.length === 0) {
       return;
     }
@@ -82,6 +82,7 @@ export class DrawingCanvas {
     this.ctx.lineWidth = path.lineWidth * scale;
     this.ctx.lineCap = path.lineCap;
     this.ctx.strokeStyle = path.strokeStyle;
+    this.ctx.filter = `blur(${path.filter.blur * scale}px) brightness(${path.filter.brightnessFactor})`;
 
     this.ctx.beginPath();
     const firstPoint = this.toCanvasPoint(path.points[0], scale);
@@ -97,6 +98,7 @@ export class DrawingCanvas {
     }
 
     this.ctx.stroke();
+    this.ctx.filter = "none";
   }
 
   public render(): void {
@@ -141,9 +143,10 @@ export class DrawingCanvas {
 
     this.activePath = {
       points: [logicalPoint],
-      lineWidth: this.lineWidth,
-      strokeStyle: this.strokeStyle,
-      lineCap: this.lineCap,
+      lineWidth: this.width,
+      strokeStyle: this.color,
+      lineCap: this.cap,
+      filter: this.createFilter(),
     };
 
     this.paths.push(this.activePath);

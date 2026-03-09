@@ -1,5 +1,5 @@
 import "./styles/style.css";
-import App from "./app/app";
+import App from "./app/Index";
 
 const backgroundCanvas = document.querySelector(
   "#app #background-canvas",
@@ -9,8 +9,7 @@ const drawingCanvas = document.querySelector(
 ) as HTMLCanvasElement;
 
 const app = new App(backgroundCanvas, drawingCanvas, {
-  strokeStyle: "#7e756d",
-  lineWidth: 2,
+  width: 2,
 });
 
 window.addEventListener("load", () => {
