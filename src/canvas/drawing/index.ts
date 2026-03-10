@@ -1,13 +1,10 @@
-import type { DrawingCanvasOptions, Filter, Path, Point } from "./types";
+import GUI from "lil-gui";
+import type { Options, Path, Point } from "./types";
 
 export class DrawingCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private width: number;
-  private cap: CanvasLineCap;
-  private color: string;
-  private brightnessRange: number;
-  private blur: number;
+  private options: Options;
   private getScale: () => number | null;
   private paths: Path[] = [];
   private activePath: Path | null = null;
@@ -16,7 +13,7 @@ export class DrawingCanvas {
   public constructor(
     canvas: HTMLCanvasElement,
     getScale: () => number | null,
-    options: DrawingCanvasOptions,
+    options: Options,
   ) {
     const context = canvas.getContext("2d");
 
@@ -26,23 +23,8 @@ export class DrawingCanvas {
 
     this.canvas = canvas;
     this.ctx = context;
-    this.cap = options.cap;
-    this.width = options.width;
-    this.color = options.color;
-    this.brightnessRange = options.brightnessRange;
-    this.blur = options.blur;
+    this.options = options;
     this.getScale = getScale;
-  }
-
-  private getFilter(): Filter {
-    const blur = Math.max(0, this.blur);
-    const brightnessRange = Math.max(0, this.brightnessRange);
-    const brightnessFactor =
-      brightnessRange === 0 ? 1 : 1 + (Math.random() * 2 - 1) * brightnessRange;
-    return {
-      blur,
-      brightnessFactor,
-    };
   }
 
   public setCanvasSize(width: number, height: number): void {
@@ -73,14 +55,14 @@ export class DrawingCanvas {
     };
   }
 
-  private applyPathSettings(path: Path, scale: number): void {
-    this.ctx.lineWidth = path.lineWidth * scale;
-    this.ctx.lineCap = path.lineCap;
-    this.ctx.strokeStyle = path.strokeStyle;
-    this.ctx.filter = `blur(${path.filter.blur * scale}px) brightness(${path.filter.brightnessFactor})`;
+  private applyPathOptions(path: Path, scale: number): void {
+    this.ctx.lineWidth = path.options.width * scale;
+    this.ctx.lineCap = path.options.cap;
+    this.ctx.strokeStyle = path.options.color;
+    this.ctx.filter = `blur(${path.options.blur * scale}px) brightness(${path.options.brightness * 100}%)`;
   }
 
-  private resetSettings(): void {
+  private resetOptions(): void {
     this.ctx.filter = "none";
   }
 
@@ -89,7 +71,7 @@ export class DrawingCanvas {
       return;
     }
 
-    this.applyPathSettings(this.activePath, scale);
+    this.applyPathOptions(this.activePath, scale);
 
     this.ctx.beginPath();
 
@@ -110,7 +92,7 @@ export class DrawingCanvas {
 
     this.ctx.stroke();
 
-    this.resetSettings();
+    this.resetOptions();
   }
 
   public render(): void {
@@ -127,7 +109,7 @@ export class DrawingCanvas {
         continue;
       }
 
-      this.applyPathSettings(path, scale);
+      this.applyPathOptions(path, scale);
 
       this.ctx.beginPath();
 
@@ -144,7 +126,7 @@ export class DrawingCanvas {
 
       this.ctx.stroke();
 
-      this.resetSettings();
+      this.resetOptions();
     }
   }
 
@@ -155,17 +137,14 @@ export class DrawingCanvas {
       return;
     }
 
+    this.isPainting = true;
+
     const canvasPoint = this.getCanvasPoint(event);
     const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
 
-    this.isPainting = true;
-
     const createdPath: Path = {
       points: [logicalPoint],
-      lineWidth: this.width,
-      strokeStyle: this.color,
-      lineCap: this.cap,
-      filter: this.getFilter(),
+      options: { ...this.options },
     };
 
     this.activePath = createdPath;
@@ -198,10 +177,19 @@ export class DrawingCanvas {
     this.renderActiveLine(scale);
   };
 
+  private initGUI() {
+    const gui = new GUI();
+    gui.add(this.options, "blur", 0, 3);
+    gui.addColor(this.options, "color");
+    gui.add(this.options, "width", 1, 20);
+    gui.add(this.options, "brightness", 0, 1);
+  }
+
   public init(): void {
     this.canvas.addEventListener("pointerdown", this.handlePointerDown);
     this.canvas.addEventListener("pointerup", this.handlePointerUp);
     this.canvas.addEventListener("pointermove", this.handlePointerMove);
+    this.initGUI();
   }
 
   public destroy(): void {

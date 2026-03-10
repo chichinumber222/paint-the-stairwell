@@ -1,3 +1,3 @@
-import type { DrawingCanvasOptions } from "../canvas/drawing/types";
+import type { Options as DrawingOptions } from "../canvas/drawing/types";
 
-export type Options = Partial<DrawingCanvasOptions>;
+export type Options = Partial<DrawingOptions>;

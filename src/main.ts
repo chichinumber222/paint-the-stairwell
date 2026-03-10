@@ -8,9 +8,7 @@ const drawingCanvas = document.querySelector(
   "#app #drawing-canvas",
 ) as HTMLCanvasElement;
 
-const app = new App(backgroundCanvas, drawingCanvas, {
-  width: 2,
-});
+const app = new App(backgroundCanvas, drawingCanvas);
 
 window.addEventListener("load", () => {
   app.init();

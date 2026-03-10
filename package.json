@@ -8,6 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "lil-gui": "^0.18.0"
+  },
   "devDependencies": {
     "typescript": "~5.9.3",
     "vite": "^7.3.1"

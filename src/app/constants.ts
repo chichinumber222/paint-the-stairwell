@@ -1,9 +1,9 @@
-import type { DrawingCanvasOptions } from "../canvas/drawing/types";
+import type { Options as DrawingOptions } from "../canvas/drawing/types";
 
-export const DEFAULT_DRAWING_OPTIONS: DrawingCanvasOptions = {
+export const DEFAULT_DRAWING_OPTIONS: DrawingOptions = {
   cap: "round",
-  width: 5,
+  width: 2,
   color: "#7e756d",
-  brightnessRange: 0.06,
+  brightness: 1,
   blur: 0.1,
 };

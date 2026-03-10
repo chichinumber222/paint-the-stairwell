@@ -33,11 +33,11 @@ export class App {
   };
 
   private syncAndRender = (): void => {
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
-    this.background.setCanvasSize(canvasWidth, canvasHeight);
-    this.drawing.setCanvasSize(canvasWidth, canvasHeight);
+    this.background.setCanvasSize(windowWidth, windowHeight);
+    this.drawing.setCanvasSize(windowWidth, windowHeight);
     this.scale = this.background.calculateScale();
 
     this.renderAll();
