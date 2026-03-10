@@ -5,5 +5,4 @@ export const DEFAULT_DRAWING_OPTIONS: DrawingOptions = {
   width: 2,
   color: "#7e756d",
   brightness: 1,
-  blur: 0.1,
 };

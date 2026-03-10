@@ -59,7 +59,7 @@ export class DrawingCanvas {
     this.ctx.lineWidth = path.options.width * scale;
     this.ctx.lineCap = path.options.cap;
     this.ctx.strokeStyle = path.options.color;
-    this.ctx.filter = `blur(${path.options.blur * scale}px) brightness(${path.options.brightness * 100}%)`;
+    this.ctx.filter = `brightness(${path.options.brightness * 100}%)`;
   }
 
   private resetOptions(): void {
@@ -113,11 +113,17 @@ export class DrawingCanvas {
 
       this.ctx.beginPath();
 
+      if (path.points.length === 1) {
+        const singlePoint = this.toCanvasPoint(path.points[0], scale);
+        this.ctx.moveTo(singlePoint.x, singlePoint.y);
+        this.ctx.lineTo(singlePoint.x, singlePoint.y);
+        this.ctx.stroke();
+        this.resetOptions();
+        continue;
+      }
+
       for (let i = 1; i < path.points.length; i += 1) {
-        const fromPoint = this.toCanvasPoint(
-          path.points[i - 1] || path.points[i],
-          scale,
-        );
+        const fromPoint = this.toCanvasPoint(path.points[i - 1], scale);
         const toPoint = this.toCanvasPoint(path.points[i], scale);
 
         this.ctx.moveTo(fromPoint.x, fromPoint.y);
@@ -179,10 +185,10 @@ export class DrawingCanvas {
 
   private initGUI() {
     const gui = new GUI();
-    gui.add(this.options, "blur", 0, 3);
     gui.addColor(this.options, "color");
     gui.add(this.options, "width", 1, 20);
     gui.add(this.options, "brightness", 0, 1);
+    gui.add(this.options, "cap", ["butt", "round", "square"]);
   }
 
   public init(): void {

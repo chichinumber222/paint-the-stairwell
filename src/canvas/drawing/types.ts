@@ -13,5 +13,4 @@ export type Options = {
   color: string;
   cap: CanvasLineCap;
   brightness: number;
-  blur: number;
 };
