@@ -4,6 +4,7 @@ import type { Options, Path, Point } from "./types";
 export class DrawingCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private gui: GUI | null = null;
   private options: Options;
   private getScale: () => number | null;
   private paths: Path[] = [];
@@ -184,11 +185,16 @@ export class DrawingCanvas {
   };
 
   private initGUI() {
-    const gui = new GUI();
-    gui.addColor(this.options, "color");
-    gui.add(this.options, "width", 1, 20);
-    gui.add(this.options, "brightness", 0, 1);
-    gui.add(this.options, "cap", ["butt", "round", "square"]);
+    this.gui = new GUI();
+    this.gui.addColor(this.options, "color");
+    this.gui.add(this.options, "width", 1, 20);
+    this.gui.add(this.options, "brightness", 0, 1);
+    this.gui.add(this.options, "cap", ["butt", "round", "square"]);
+  }
+
+  private destroyGUI() {
+    this.gui?.destroy();
+    this.gui = null;
   }
 
   public init(): void {
@@ -202,5 +208,6 @@ export class DrawingCanvas {
     this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointermove", this.handlePointerMove);
+    this.destroyGUI();
   }
 }
