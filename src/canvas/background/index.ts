@@ -1,14 +1,16 @@
+import { ImageLoader } from "./image-loader";
+
 export class BackgroundCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private image: HTMLImageElement;
+  private image: HTMLImageElement | null = null;
   private getScale: () => number | null;
+  private imageLoader: ImageLoader;
 
   public constructor(
     canvas: HTMLCanvasElement,
     imageUrl: string,
     getScale: () => number | null,
-    onReady?: () => void,
   ) {
     const context = canvas.getContext("2d");
 
@@ -20,23 +22,16 @@ export class BackgroundCanvas {
     this.ctx = context;
     this.getScale = getScale;
 
-    this.image = new Image();
-    this.image.addEventListener("load", () => {
-      onReady?.();
-    });
-    this.image.src = imageUrl;
+    this.imageLoader = new ImageLoader(imageUrl);
+    this.imageLoader.getImage().then((image) => (this.image = image));
   }
 
   public calculateScale(): number | null {
     if (
-      !this.image.complete ||
+      !this.image ||
       this.image.naturalWidth === 0 ||
       this.image.naturalHeight === 0
     ) {
-      return null;
-    }
-
-    if (this.canvas.width === 0 || this.canvas.height === 0) {
       return null;
     }
 
@@ -45,21 +40,48 @@ export class BackgroundCanvas {
     return Math.max(scaleX, scaleY);
   }
 
+  public getOriginalImageSize(): { width: number; height: number } | null {
+    if (!this.image) {
+      return null;
+    }
+
+    return {
+      width: this.image.naturalWidth,
+      height: this.image.naturalHeight,
+    };
+  }
+
   public setCanvasSize(width: number, height: number): void {
     this.canvas.width = width;
     this.canvas.height = height;
   }
 
-  public render(): void {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  public async init(): Promise<void> {
+    await this.imageLoader.getImage();
+  }
 
+  public destroy(): void {
+    // cleanup if necessary (e.g., remove event listeners)
+  }
+
+  public render(): void {
     const scale = this.getScale();
 
-    if (!this.image.complete || !scale) {
+    if (scale === null) {
       return;
     }
 
-    this.ctx.drawImage(
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.renderTo(this.ctx, scale);
+  }
+
+  public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
+    if (!this.image) {
+      return;
+    }
+
+    ctx.drawImage(
       this.image,
       0,
       0,

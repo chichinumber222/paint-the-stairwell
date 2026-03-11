@@ -56,15 +56,19 @@ export class DrawingCanvas {
     };
   }
 
-  private applyPathOptions(path: Path, scale: number): void {
-    this.ctx.lineWidth = path.options.width * scale;
-    this.ctx.lineCap = path.options.cap;
-    this.ctx.strokeStyle = path.options.color;
-    this.ctx.filter = `brightness(${path.options.brightness * 100}%)`;
+  private applyPathOptionsToContext(
+    ctx: CanvasRenderingContext2D,
+    path: Path,
+    scale: number,
+  ): void {
+    ctx.lineWidth = path.options.width * scale;
+    ctx.lineCap = path.options.cap;
+    ctx.strokeStyle = path.options.color;
+    ctx.filter = `brightness(${path.options.brightness * 100}%)`;
   }
 
-  private resetOptions(): void {
-    this.ctx.filter = "none";
+  private resetOptionsFromContext(ctx: CanvasRenderingContext2D): void {
+    ctx.filter = "none";
   }
 
   private renderActiveLine(scale: number): void {
@@ -72,7 +76,7 @@ export class DrawingCanvas {
       return;
     }
 
-    this.applyPathOptions(this.activePath, scale);
+    this.applyPathOptionsToContext(this.ctx, this.activePath, scale);
 
     this.ctx.beginPath();
 
@@ -93,7 +97,7 @@ export class DrawingCanvas {
 
     this.ctx.stroke();
 
-    this.resetOptions();
+    this.resetOptionsFromContext(this.ctx);
   }
 
   public render(): void {
@@ -105,21 +109,25 @@ export class DrawingCanvas {
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    this.renderTo(this.ctx, scale);
+  }
+
+  public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
     for (const path of this.paths) {
       if (path.points.length === 0) {
         continue;
       }
 
-      this.applyPathOptions(path, scale);
+      this.applyPathOptionsToContext(ctx, path, scale);
 
-      this.ctx.beginPath();
+      ctx.beginPath();
 
       if (path.points.length === 1) {
         const singlePoint = this.toCanvasPoint(path.points[0], scale);
-        this.ctx.moveTo(singlePoint.x, singlePoint.y);
-        this.ctx.lineTo(singlePoint.x, singlePoint.y);
-        this.ctx.stroke();
-        this.resetOptions();
+        ctx.moveTo(singlePoint.x, singlePoint.y);
+        ctx.lineTo(singlePoint.x, singlePoint.y);
+        ctx.stroke();
+        this.resetOptionsFromContext(ctx);
         continue;
       }
 
@@ -127,13 +135,13 @@ export class DrawingCanvas {
         const fromPoint = this.toCanvasPoint(path.points[i - 1], scale);
         const toPoint = this.toCanvasPoint(path.points[i], scale);
 
-        this.ctx.moveTo(fromPoint.x, fromPoint.y);
-        this.ctx.lineTo(toPoint.x, toPoint.y);
+        ctx.moveTo(fromPoint.x, fromPoint.y);
+        ctx.lineTo(toPoint.x, toPoint.y);
       }
 
-      this.ctx.stroke();
+      ctx.stroke();
 
-      this.resetOptions();
+      this.resetOptionsFromContext(ctx);
     }
   }
 

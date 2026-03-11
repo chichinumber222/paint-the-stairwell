@@ -1,8 +1,7 @@
-import backgroundImageUrl from "../assets/elevator.png";
 import { BackgroundCanvas } from "../canvas/background";
 import { DrawingCanvas } from "../canvas/drawing";
 import { DEFAULT_DRAWING_OPTIONS } from "./constants";
-import type { Options } from "./types";
+import type { BackgroundConfig, DrawingConfig } from "./types";
 
 export class App {
   private background: BackgroundCanvas;
@@ -10,21 +9,22 @@ export class App {
   private scale: number | null = null;
 
   public constructor(
-    backgroundCanvas: HTMLCanvasElement,
-    drawingCanvas: HTMLCanvasElement,
-    options: Options = {},
+    {
+      canvas: backgroundCanvas,
+      imageUrl: backgroundImageUrl,
+    }: BackgroundConfig,
+    { canvas: drawingCanvas, options: drawingOptions }: DrawingConfig,
   ) {
-    this.drawing = new DrawingCanvas(drawingCanvas, () => this.scale, {
-      ...DEFAULT_DRAWING_OPTIONS,
-      ...options,
-    });
-
     this.background = new BackgroundCanvas(
       backgroundCanvas,
       backgroundImageUrl,
       () => this.scale,
-      this.syncAndRender,
     );
+
+    this.drawing = new DrawingCanvas(drawingCanvas, () => this.scale, {
+      ...DEFAULT_DRAWING_OPTIONS,
+      ...drawingOptions,
+    });
   }
 
   private renderAll = (): void => {
@@ -43,15 +43,38 @@ export class App {
     this.renderAll();
   };
 
-  public init(): void {
-    this.syncAndRender();
+  public async init(): Promise<void> {
     this.drawing.init();
+    await this.background.init();
+    this.syncAndRender();
     window.addEventListener("resize", this.syncAndRender);
   }
 
   public destroy(): void {
     this.drawing.destroy();
+    this.background.destroy();
     window.removeEventListener("resize", this.syncAndRender);
+  }
+
+  public handleExport() {
+    const finalCanvas = document.createElement("canvas");
+    const finalContext = finalCanvas.getContext("2d");
+    if (!finalContext) return;
+
+    const backgroundImageSize = this.background.getOriginalImageSize();
+    if (!backgroundImageSize) return;
+    const exportScale = 1;
+    finalCanvas.width = backgroundImageSize.width * exportScale;
+    finalCanvas.height = backgroundImageSize.height * exportScale;
+
+    this.background.renderTo(finalContext, exportScale);
+    this.drawing.renderTo(finalContext, exportScale);
+
+    const dataUrl = finalCanvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "stairwell.png";
+    link.click();
   }
 }
 
