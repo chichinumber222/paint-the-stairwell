@@ -1,4 +1,4 @@
-import { ImageLoader } from "./image-loader";
+import { ImageLoader } from "./loaders";
 
 export class BackgroundCanvas {
   private canvas: HTMLCanvasElement;
