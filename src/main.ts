@@ -1,6 +1,7 @@
 import "./styles/style.css";
 import App from "./app/Index";
 import backgroundImageUrl from "./assets/elevator.png";
+import { ErrorGuard } from "./error-boundary/utils";
 
 const backgroundCanvas = document.querySelector(
   "#app #background-canvas",
@@ -8,6 +9,13 @@ const backgroundCanvas = document.querySelector(
 const drawingCanvas = document.querySelector(
   "#app #drawing-canvas",
 ) as HTMLCanvasElement;
+
+const exportButton = document.querySelector(
+  "#export-button",
+) as HTMLButtonElement;
+
+const errorGuard = new ErrorGuard();
+errorGuard.init();
 
 const app = new App(
   {
@@ -20,17 +28,13 @@ const app = new App(
 );
 
 window.addEventListener("load", () => {
-  app.init();
+  void errorGuard.safe(() => app.init(), "App initialization");
 });
 
 window.addEventListener("beforeunload", () => {
-  app.destroy();
+  void errorGuard.safe(() => app.destroy(), "App destruction");
 });
 
-const exportButton = document.querySelector(
-  "#export-button",
-) as HTMLButtonElement;
-
 exportButton.addEventListener("click", () => {
-  app.handleExport();
+  void errorGuard.safe(() => app.handleExport(), "Export handling");
 });
