@@ -9,7 +9,10 @@
     <div id="app">
       <canvas id="background-canvas"></canvas>
       <canvas id="drawing-canvas"></canvas>
-      <button id="export-button">Export</button>
+      <div id="export-controls">
+        <p id="export-status" tabindex="-1" hidden></p>
+        <button id="export-button">Export</button>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

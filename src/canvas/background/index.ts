@@ -23,7 +23,6 @@ export class BackgroundCanvas {
     this.getScale = getScale;
 
     this.imageLoader = new ImageLoader(imageUrl);
-    this.imageLoader.getImage().then((image) => (this.image = image));
   }
 
   public calculateScale(): number | null {
@@ -57,7 +56,7 @@ export class BackgroundCanvas {
   }
 
   public async init(): Promise<void> {
-    await this.imageLoader.getImage();
+    this.image = await this.imageLoader.load();
   }
 
   public destroy(): void {
@@ -78,7 +77,7 @@ export class BackgroundCanvas {
 
   public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
     if (!this.image) {
-      return;
+      throw new Error("Cannot render background: image is not loaded.");
     }
 
     ctx.drawImage(

@@ -1,11 +1,14 @@
 import { BackgroundCanvas } from "../canvas/background";
 import { DrawingCanvas } from "../canvas/drawing";
+import { ExportService } from "./export/ExportService";
+import type { ExportState } from "./export/types";
 import { DEFAULT_DRAWING_OPTIONS } from "./constants";
 import type { BackgroundConfig, DrawingConfig } from "./types";
 
 export class App {
   private background: BackgroundCanvas;
   private drawing: DrawingCanvas;
+  private exportService: ExportService;
   private scale: number | null = null;
 
   public constructor(
@@ -25,6 +28,15 @@ export class App {
       ...DEFAULT_DRAWING_OPTIONS,
       ...drawingOptions,
     });
+
+    this.exportService = new ExportService({
+      fileName: "stairwell.png",
+      getExportSize: () => this.background.getOriginalImageSize(),
+      renderExportContent: (ctx, scale) => {
+        this.background.renderTo(ctx, scale);
+        this.drawing.renderTo(ctx, scale);
+      },
+    });
   }
 
   private renderAll = (): void => {
@@ -39,6 +51,12 @@ export class App {
     this.background.setCanvasSize(windowWidth, windowHeight);
     this.drawing.setCanvasSize(windowWidth, windowHeight);
     this.scale = this.background.calculateScale();
+
+    if (this.scale === null) {
+      throw new Error(
+        "Unable to calculate canvas scale: background image is not ready or has invalid size.",
+      );
+    }
 
     this.renderAll();
   };
@@ -56,25 +74,18 @@ export class App {
     window.removeEventListener("resize", this.syncAndRender);
   }
 
-  public handleExport() {
-    const finalCanvas = document.createElement("canvas");
-    const finalContext = finalCanvas.getContext("2d");
-    if (!finalContext) return;
+  public subscribeToExportState(
+    listener: (state: ExportState) => void,
+  ): () => void {
+    return this.exportService.subscribe(listener);
+  }
 
-    const backgroundImageSize = this.background.getOriginalImageSize();
-    if (!backgroundImageSize) return;
-    const exportScale = 1;
-    finalCanvas.width = backgroundImageSize.width * exportScale;
-    finalCanvas.height = backgroundImageSize.height * exportScale;
+  public async handleExport(): Promise<boolean> {
+    return this.exportService.export();
+  }
 
-    this.background.renderTo(finalContext, exportScale);
-    this.drawing.renderTo(finalContext, exportScale);
-
-    const dataUrl = finalCanvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = "stairwell.png";
-    link.click();
+  public clearExportError(): void {
+    this.exportService.clearError();
   }
 }
 

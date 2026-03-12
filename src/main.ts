@@ -13,6 +13,9 @@ const drawingCanvas = document.querySelector(
 const exportButton = document.querySelector(
   "#export-button",
 ) as HTMLButtonElement;
+const exportStatus = document.querySelector(
+  "#export-status",
+) as HTMLParagraphElement;
 
 const errorGuard = new ErrorGuard();
 errorGuard.init();
@@ -27,12 +30,27 @@ const app = new App(
   },
 );
 
+const unsubscribeExportState = app.subscribeToExportState((state) => {
+  exportButton.disabled = state.isLoading;
+  exportStatus.textContent = state.error ?? "";
+  exportStatus.hidden = !state.error;
+  if (state.error) exportStatus.focus();
+});
+
+exportStatus.addEventListener("blur", () => {
+  app.clearExportError();
+});
+
 window.addEventListener("load", () => {
   void errorGuard.safe(() => app.init(), "App initialization");
 });
 
 window.addEventListener("beforeunload", () => {
   void errorGuard.safe(() => app.destroy(), "App destruction");
+  void errorGuard.safe(
+    () => unsubscribeExportState(),
+    "Unsubscribing from export state",
+  );
 });
 
 exportButton.addEventListener("click", () => {
