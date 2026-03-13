@@ -39,7 +39,7 @@ const backgroundCanvas = new BackgroundCanvas(
   backgroundCanvasElement,
   elevatorImage,
 );
-backgroundCanvas.init();
+await backgroundCanvas.init();
 
 const drawingCanvas = new DrawingCanvas(drawingCanvasElement, startOptions);
 drawingCanvas.init();
