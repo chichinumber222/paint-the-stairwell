@@ -1,20 +1,11 @@
-import type {
-  ExportServiceConfig,
-  ExportState,
-  ExportStateListener,
-} from "./types";
+import type { ExportConfig, ExportState, ExportStateListener } from "./types";
 
 export class ExportService {
-  private readonly config: ExportServiceConfig;
   private state: ExportState = {
     isLoading: false,
     error: null,
   };
   private listeners = new Set<ExportStateListener>();
-
-  public constructor(config: ExportServiceConfig) {
-    this.config = config;
-  }
 
   public subscribe(listener: ExportStateListener): () => void {
     this.listeners.add(listener);
@@ -25,7 +16,7 @@ export class ExportService {
     };
   }
 
-  public async export(): Promise<boolean> {
+  public async export(config: ExportConfig): Promise<boolean> {
     if (this.state.isLoading) {
       return false;
     }
@@ -44,7 +35,7 @@ export class ExportService {
         return false;
       }
 
-      const exportSize = this.config.getExportSize();
+      const exportSize = config.getExportSize();
 
       if (!exportSize) {
         this.setState({
@@ -58,12 +49,12 @@ export class ExportService {
       finalCanvas.width = exportSize.width * exportScale;
       finalCanvas.height = exportSize.height * exportScale;
 
-      this.config.renderExportContent(finalContext, exportScale);
+      config.renderExportContent(finalContext, exportScale);
 
       const dataUrl = finalCanvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = this.config.fileName;
+      link.download = config.fileName;
       link.click();
 
       this.setState({ isLoading: false, error: null });

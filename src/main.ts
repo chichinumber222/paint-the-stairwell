@@ -1,58 +1,67 @@
-import "./styles/style.css";
-import App from "./app/Index";
-import backgroundImageUrl from "./assets/elevator.png";
-import { ErrorGuard } from "./error-boundary/utils";
-
-const backgroundCanvas = document.querySelector(
-  "#app #background-canvas",
-) as HTMLCanvasElement;
-const drawingCanvas = document.querySelector(
-  "#app #drawing-canvas",
-) as HTMLCanvasElement;
-
-const exportButton = document.querySelector(
-  "#export-button",
-) as HTMLButtonElement;
-const exportStatus = document.querySelector(
-  "#export-status",
-) as HTMLParagraphElement;
+import "./shared/styles/style.css";
+import elevatorImage from "./shared/assets/elevator.png";
+import { BackgroundCanvas } from "./infrastructure/canvas/background";
+import { DrawingCanvas } from "./infrastructure/canvas/drawing";
+import type { Options } from "./infrastructure/canvas/drawing/types";
+import { ErrorGuard } from "./infrastructure/error-boundary";
+import App from "./application/app";
+import { ExportService } from "./application/export/ExportService";
+import { WindowLifecycleBinder } from "./presentation/windowLifecycleBinder";
+import { OptionsControlPanel } from "./presentation/optionsControlPanel";
+import { ExportControlsBinder } from "./presentation/exportBinder";
 
 const errorGuard = new ErrorGuard();
 errorGuard.init();
 
-const app = new App(
-  {
-    canvas: backgroundCanvas,
-    imageUrl: backgroundImageUrl,
-  },
-  {
-    canvas: drawingCanvas,
-  },
+const backgroundCanvasElement = document.querySelector(
+  "#app #background-canvas",
+) as HTMLCanvasElement;
+const drawingCanvasElement = document.querySelector(
+  "#app #drawing-canvas",
+) as HTMLCanvasElement;
+
+const exportButtonElement = document.querySelector(
+  "#export-button",
+) as HTMLButtonElement;
+const exportStatusElement = document.querySelector(
+  "#export-status",
+) as HTMLParagraphElement;
+
+const startOptions: Options = {
+  cap: "round",
+  width: 2,
+  color: "#7e756d",
+  brightness: 1,
+};
+
+// infrastructure
+const backgroundCanvas = new BackgroundCanvas(
+  backgroundCanvasElement,
+  elevatorImage,
 );
+backgroundCanvas.init();
 
-const unsubscribeExportState = app.subscribeToExportState((state) => {
-  exportButton.disabled = state.isLoading;
-  exportStatus.textContent = state.error ?? "";
-  exportStatus.hidden = !state.error;
-  if (state.error) exportStatus.focus();
+const drawingCanvas = new DrawingCanvas(drawingCanvasElement, startOptions);
+drawingCanvas.init();
+
+// application
+const exportService = new ExportService();
+const app = new App({
+  background: backgroundCanvas,
+  drawing: drawingCanvas,
+  exportService,
 });
 
-exportStatus.addEventListener("blur", () => {
-  app.clearExportError();
-});
+// presentation
+const windowLifecycleBinder = new WindowLifecycleBinder(app);
+windowLifecycleBinder.init();
 
-window.addEventListener("load", () => {
-  void errorGuard.safe(() => app.init(), "App initialization");
-});
+const exportControlsBinder = new ExportControlsBinder(
+  app,
+  exportButtonElement,
+  exportStatusElement,
+);
+exportControlsBinder.init();
 
-window.addEventListener("beforeunload", () => {
-  void errorGuard.safe(() => app.destroy(), "App destruction");
-  void errorGuard.safe(
-    () => unsubscribeExportState(),
-    "Unsubscribing from export state",
-  );
-});
-
-exportButton.addEventListener("click", () => {
-  void errorGuard.safe(() => app.handleExport(), "Export handling");
-});
+const optionsControlPanel = new OptionsControlPanel(app, startOptions);
+optionsControlPanel.init();

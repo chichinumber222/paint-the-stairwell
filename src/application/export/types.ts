@@ -8,7 +8,7 @@ export interface ExportState {
   error: string | null;
 }
 
-export interface ExportServiceConfig {
+export interface ExportConfig {
   fileName: string;
   getExportSize: () => ExportSize | null;
   renderExportContent: (ctx: CanvasRenderingContext2D, scale: number) => void;

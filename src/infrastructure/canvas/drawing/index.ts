@@ -1,21 +1,15 @@
-import GUI from "lil-gui";
 import type { Options, Path, Point } from "./types";
 
 export class DrawingCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private gui: GUI | null = null;
   private options: Options;
-  private getScale: () => number | null;
+  private scale: number = 1;
   private paths: Path[] = [];
   private activePath: Path | null = null;
   private isPainting = false;
 
-  public constructor(
-    canvas: HTMLCanvasElement,
-    getScale: () => number | null,
-    options: Options,
-  ) {
+  public constructor(canvas: HTMLCanvasElement, options: Options) {
     const context = canvas.getContext("2d");
 
     if (!context) {
@@ -25,7 +19,14 @@ export class DrawingCanvas {
     this.canvas = canvas;
     this.ctx = context;
     this.options = options;
-    this.getScale = getScale;
+  }
+
+  public setOptions(options: Partial<Options>): void {
+    this.options = { ...this.options, ...options };
+  }
+
+  public setScale(scale: number): void {
+    this.scale = scale;
   }
 
   public setCanvasSize(width: number, height: number): void {
@@ -101,15 +102,8 @@ export class DrawingCanvas {
   }
 
   public render(): void {
-    const scale = this.getScale();
-
-    if (!scale) {
-      return;
-    }
-
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.renderTo(this.ctx, scale);
+    this.renderTo(this.ctx, this.scale);
   }
 
   public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
@@ -146,11 +140,7 @@ export class DrawingCanvas {
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
-    const scale = this.getScale();
-
-    if (!scale) {
-      return;
-    }
+    const scale = this.scale;
 
     this.isPainting = true;
 
@@ -178,11 +168,7 @@ export class DrawingCanvas {
       return;
     }
 
-    const scale = this.getScale();
-
-    if (!scale) {
-      return;
-    }
+    const scale = this.scale;
 
     const canvasPoint = this.getCanvasPoint(event);
     const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
@@ -192,30 +178,15 @@ export class DrawingCanvas {
     this.renderActiveLine(scale);
   };
 
-  private initGUI() {
-    this.gui = new GUI();
-    this.gui.addColor(this.options, "color");
-    this.gui.add(this.options, "width", 1, 20);
-    this.gui.add(this.options, "brightness", 0, 1);
-    this.gui.add(this.options, "cap", ["butt", "round", "square"]);
-  }
-
-  private destroyGUI() {
-    this.gui?.destroy();
-    this.gui = null;
-  }
-
   public init(): void {
     this.canvas.addEventListener("pointerdown", this.handlePointerDown);
     this.canvas.addEventListener("pointerup", this.handlePointerUp);
     this.canvas.addEventListener("pointermove", this.handlePointerMove);
-    this.initGUI();
   }
 
   public destroy(): void {
     this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointermove", this.handlePointerMove);
-    this.destroyGUI();
   }
 }

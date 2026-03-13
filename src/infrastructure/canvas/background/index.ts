@@ -4,14 +4,10 @@ export class BackgroundCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private image: HTMLImageElement | null = null;
-  private getScale: () => number | null;
   private imageLoader: ImageLoader;
+  private scale: number = 1;
 
-  public constructor(
-    canvas: HTMLCanvasElement,
-    imageUrl: string,
-    getScale: () => number | null,
-  ) {
+  public constructor(canvas: HTMLCanvasElement, imageUrl: string) {
     const context = canvas.getContext("2d");
 
     if (!context) {
@@ -20,7 +16,6 @@ export class BackgroundCanvas {
 
     this.canvas = canvas;
     this.ctx = context;
-    this.getScale = getScale;
 
     this.imageLoader = new ImageLoader(imageUrl);
   }
@@ -36,7 +31,8 @@ export class BackgroundCanvas {
 
     const scaleX = this.canvas.width / this.image.naturalWidth;
     const scaleY = this.canvas.height / this.image.naturalHeight;
-    return Math.max(scaleX, scaleY);
+    this.scale = Math.max(scaleX, scaleY);
+    return this.scale;
   }
 
   public getOriginalImageSize(): { width: number; height: number } | null {
@@ -59,20 +55,9 @@ export class BackgroundCanvas {
     this.image = await this.imageLoader.load();
   }
 
-  public destroy(): void {
-    // cleanup if necessary (e.g., remove event listeners)
-  }
-
   public render(): void {
-    const scale = this.getScale();
-
-    if (scale === null) {
-      return;
-    }
-
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.renderTo(this.ctx, scale);
+    this.renderTo(this.ctx, this.scale);
   }
 
   public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
