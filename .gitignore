@@ -1,24 +1,31 @@
-# Logs
-logs
+# Директории node_modules (для client)
+client/node_modules/
+client/package-lock.json 
+
+# Серверная часть
+server/vendor/
+server/composer.lock
+server/.env
+server/.env.local
+server/.env.*.local
+server/logs/
+server/temp/
+server/cache/
+
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+*.tmp
+*.temp
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# Редакторы и IDE
+.vscode/
+.idea/
+*.sublime-*
+.project
+.classpath
+
+# Системные файлы
+*.swp
+*.swo
+*~
