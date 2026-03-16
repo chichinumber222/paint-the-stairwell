@@ -1,5 +1,5 @@
 <?php 
-$manifestJsonFile = file_get_contents('.vite/manifest.json');
+$manifestJsonFile = file_get_contents('manifest.json');
 $manifest = json_decode($manifestJsonFile);
 ?>
 <!doctype html>
