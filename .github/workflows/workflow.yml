@@ -33,8 +33,9 @@ jobs:
       - name: Combine with server files
         run: |
           mkdir -p deploy
-          cp -r client/dist/. deploy/
-          cp -r server/* deploy/
+          cp -r client/dist/assets deploy/
+          cp -r client/dist/.vite/. deploy/
+          cp -r server/. deploy/
 
       - name: Upload combined package
         uses: actions/upload-artifact@v4
