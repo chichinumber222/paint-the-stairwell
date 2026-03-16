@@ -1,0 +1,43 @@
+name: NodeJS with Webpack
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies (frontend)
+      working-directory: cd ./client
+      run: npm ci
+
+    - name: Build (frontend)
+      working-directory: ./client
+      run: npm run build
+
+    - name: Combine with server files
+      run:  |
+        mkdir -p deploy
+        cp -r client/dist/* deploy/
+        cp -r server/* deploy/
+
+    - name: Upload combined package
+      uses: actions/upload-artifact@v4
+      with: 
+        name: project-package
+        path: deploy/
