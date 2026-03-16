@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky"
+    "prepare": "cd .. && husky client/.husky"
   },
   "dependencies": {
     "lil-gui": "^0.18.0"
@@ -29,12 +29,12 @@
     "vite": "^7.3.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint . --fix",
-      "prettier . --write"
+    "**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
     ],
-    "*.{json,md,css}": [
-      "prettier . --write"
+    "**/*.{json,md,css}": [
+      "prettier --write"
     ]
   }
 }
