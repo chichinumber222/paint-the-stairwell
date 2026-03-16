@@ -22,8 +22,8 @@ const exportButtonElement = document.querySelector("#export-button") as HTMLButt
 const exportStatusElement = document.querySelector("#export-status") as HTMLParagraphElement;
 
 const defaultOptions: Options = {
-  cap: "square",
-  width: 3,
+  cap: "round",
+  width: 2,
   color: "#7e756d",
   brightness: 1,
 };
