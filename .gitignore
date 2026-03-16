@@ -1,6 +1,7 @@
 # Директории node_modules (для client)
 client/node_modules/
-client/package-lock.json 
+client/package-lock.json
+client/dist
 
 # Серверная часть
 server/vendor/
