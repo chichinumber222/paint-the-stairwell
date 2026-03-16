@@ -60,10 +60,7 @@ export class ExportService {
       this.setState({ isLoading: false, error: null });
       return true;
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Export failed with unknown error.";
+      const message = error instanceof Error ? error.message : "Export failed with unknown error.";
 
       this.setState({
         isLoading: false,

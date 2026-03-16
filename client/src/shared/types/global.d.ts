@@ -1,4 +1,4 @@
-import { Path } from "../../application/types";
+import { type Path } from "../../application/types";
 
 declare global {
   interface Window {

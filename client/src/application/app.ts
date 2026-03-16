@@ -41,9 +41,7 @@ export class App {
     this.renderAll();
   };
 
-  public subscribeToExportState(
-    listener: (state: ExportState) => void,
-  ): () => void {
+  public subscribeToExportState(listener: (state: ExportState) => void): () => void {
     return this.exportService.subscribe(listener);
   }
 

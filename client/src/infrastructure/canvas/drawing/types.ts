@@ -1,16 +1,16 @@
-export type Path = {
+export interface Path {
   points: Point[];
   options: Options;
-};
+}
 
-export type Point = {
+export interface Point {
   x: number;
   y: number;
-};
+}
 
-export type Options = {
+export interface Options {
   width: number;
   color: string;
   cap: CanvasLineCap;
   brightness: number;
-};
+}

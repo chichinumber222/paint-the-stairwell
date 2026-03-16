@@ -16,16 +16,10 @@ errorGuard.init();
 const backgroundCanvasElement = document.querySelector(
   "#app #background-canvas",
 ) as HTMLCanvasElement;
-const drawingCanvasElement = document.querySelector(
-  "#app #drawing-canvas",
-) as HTMLCanvasElement;
+const drawingCanvasElement = document.querySelector("#app #drawing-canvas") as HTMLCanvasElement;
 
-const exportButtonElement = document.querySelector(
-  "#export-button",
-) as HTMLButtonElement;
-const exportStatusElement = document.querySelector(
-  "#export-status",
-) as HTMLParagraphElement;
+const exportButtonElement = document.querySelector("#export-button") as HTMLButtonElement;
+const exportStatusElement = document.querySelector("#export-status") as HTMLParagraphElement;
 
 const defaultOptions: Options = {
   cap: "round",
@@ -35,10 +29,7 @@ const defaultOptions: Options = {
 };
 
 // infrastructure
-const backgroundCanvas = new BackgroundCanvas(
-  backgroundCanvasElement,
-  elevatorImage,
-);
+const backgroundCanvas = new BackgroundCanvas(backgroundCanvasElement, elevatorImage);
 await backgroundCanvas.init();
 
 const drawingCanvas = new DrawingCanvas(drawingCanvasElement, defaultOptions);

@@ -5,7 +5,7 @@ export class BackgroundCanvas {
   private ctx: CanvasRenderingContext2D;
   private image: HTMLImageElement | null = null;
   private imageLoader: ImageLoader;
-  private scale: number = 1;
+  private scale = 1;
 
   public constructor(canvas: HTMLCanvasElement, imageUrl: string) {
     const context = canvas.getContext("2d");
@@ -21,11 +21,7 @@ export class BackgroundCanvas {
   }
 
   public calculateScale(): number | null {
-    if (
-      !this.image ||
-      this.image.naturalWidth === 0 ||
-      this.image.naturalHeight === 0
-    ) {
+    if (!this.image || this.image.naturalWidth === 0 || this.image.naturalHeight === 0) {
       return null;
     }
 

@@ -16,24 +16,16 @@ export class OptionsControlPanel {
     this.gui = new GUI();
     this.gui
       .addColor(this.options, "color")
-      .onChange((value: string) =>
-        this.app.setOptions({ color: value }),
-      );
+      .onChange((value: string) => this.app.setOptions({ color: value }));
     this.gui
       .add(this.options, "width", 1, 20)
-      .onChange((value: number) =>
-        this.app.setOptions({ width: value }),
-      );
+      .onChange((value: number) => this.app.setOptions({ width: value }));
     this.gui
       .add(this.options, "brightness", 0, 1)
-      .onChange((value: number) =>
-        this.app.setOptions({ brightness: value }),
-      );
+      .onChange((value: number) => this.app.setOptions({ brightness: value }));
     this.gui
       .add(this.options, "cap", ["butt", "round", "square"])
-      .onChange((value: "butt" | "round" | "square") =>
-        this.app.setOptions({ cap: value }),
-      );
+      .onChange((value: "butt" | "round" | "square") => this.app.setOptions({ cap: value }));
   }
 
   public destroy(): void {

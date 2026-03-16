@@ -4,7 +4,7 @@ export class DrawingCanvas {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private options: Options;
-  private scale: number = 1;
+  private scale = 1;
   private paths: Path[] = [];
   private activePath: Path | null = null;
   private isPainting = false;
@@ -97,14 +97,10 @@ export class DrawingCanvas {
     const lastIndex = this.activePath.points.length - 1;
 
     const fromPoint = this.toCanvasPoint(
-      this.activePath.points[lastIndex - 1] ||
-        this.activePath.points[lastIndex],
+      this.activePath.points[lastIndex - 1] || this.activePath.points[lastIndex],
       scale,
     );
-    const toPoint = this.toCanvasPoint(
-      this.activePath.points[lastIndex],
-      scale,
-    );
+    const toPoint = this.toCanvasPoint(this.activePath.points[lastIndex], scale);
 
     this.ctx.moveTo(fromPoint.x, fromPoint.y);
     this.ctx.lineTo(toPoint.x, toPoint.y);

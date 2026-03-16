@@ -15,8 +15,7 @@ export class ImageLoader {
 
     this._promise = new Promise((resolve, reject) => {
       this._image.onload = () => resolve(this._image);
-      this._image.onerror = () =>
-        reject(new Error(`Failed to load image: ${this._src}`));
+      this._image.onerror = () => reject(new Error(`Failed to load image: ${this._src}`));
       this._image.src = this._src;
     });
 
