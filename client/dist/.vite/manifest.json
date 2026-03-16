@@ -1,0 +1,18 @@
+{
+  "index.html": {
+    "file": "assets/index-BUPfRdg6.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "css": [
+      "assets/index-BwgQiO-j.css"
+    ],
+    "assets": [
+      "assets/elevator-7Fasneo5.png"
+    ]
+  },
+  "src/shared/assets/elevator.png": {
+    "file": "assets/elevator-7Fasneo5.png",
+    "src": "src/shared/assets/elevator.png"
+  }
+}

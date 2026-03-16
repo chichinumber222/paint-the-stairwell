@@ -33,7 +33,7 @@ jobs:
       - name: Combine with server files
         run: |
           mkdir -p deploy
-          cp -r client/dist/* deploy/
+          cp -r client/dist/. deploy/
           cp -r server/* deploy/
 
       - name: Upload combined package
