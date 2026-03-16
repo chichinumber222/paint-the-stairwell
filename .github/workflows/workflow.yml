@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: Build and upload package
 
 on:
   push:
@@ -23,11 +23,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies (frontend)
-        working-directory: cd ./client
+        working-directory: client
         run: npm ci
 
       - name: Build (frontend)
-        working-directory: ./client
+        working-directory: client
         run: npm run build
 
       - name: Combine with server files
