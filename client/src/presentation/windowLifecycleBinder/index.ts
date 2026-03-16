@@ -7,6 +7,12 @@ export class WindowLifecycleBinder {
     this.app = app;
   }
 
+  public setPreloadedData(): void {
+    const data = window.__PRELOADED_STATE__;
+    if (!data || !data.paths) return;
+    this.app.replacePaths(data.paths);
+  }
+
   public init(): () => void {
     const renderApp = () => this.app.syncAndRender();
     window.addEventListener("load", renderApp);

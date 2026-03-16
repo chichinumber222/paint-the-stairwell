@@ -1,4 +1,4 @@
-import "./shared/styles/style.css";
+import "./shared/styles/global.css";
 import elevatorImage from "./shared/assets/elevator.png";
 import { BackgroundCanvas } from "./infrastructure/canvas/background";
 import { DrawingCanvas } from "./infrastructure/canvas/drawing";
@@ -27,7 +27,7 @@ const exportStatusElement = document.querySelector(
   "#export-status",
 ) as HTMLParagraphElement;
 
-const startOptions: Options = {
+const defaultOptions: Options = {
   cap: "round",
   width: 2,
   color: "#7e756d",
@@ -41,7 +41,7 @@ const backgroundCanvas = new BackgroundCanvas(
 );
 await backgroundCanvas.init();
 
-const drawingCanvas = new DrawingCanvas(drawingCanvasElement, startOptions);
+const drawingCanvas = new DrawingCanvas(drawingCanvasElement, defaultOptions);
 drawingCanvas.init();
 
 // application
@@ -54,6 +54,7 @@ const app = new App({
 
 // presentation
 const windowLifecycleBinder = new WindowLifecycleBinder(app);
+windowLifecycleBinder.setPreloadedData();
 windowLifecycleBinder.init();
 
 const exportControlsBinder = new ExportControlsBinder(
@@ -63,5 +64,5 @@ const exportControlsBinder = new ExportControlsBinder(
 );
 exportControlsBinder.init();
 
-const optionsControlPanel = new OptionsControlPanel(app, startOptions);
+const optionsControlPanel = new OptionsControlPanel(app, defaultOptions);
 optionsControlPanel.init();

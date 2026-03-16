@@ -34,6 +34,14 @@ export class DrawingCanvas {
     this.canvas.height = height;
   }
 
+  public replacePaths(paths: Path[]): void {
+    this.cancelActiveDrawing();
+    this.paths = paths.map((path) => ({
+      points: path.points,
+      options: { ...path.options },
+    }));
+  }
+
   private getCanvasPoint(event: PointerEvent): Point {
     const rect = this.canvas.getBoundingClientRect();
 
@@ -70,6 +78,11 @@ export class DrawingCanvas {
 
   private resetOptionsFromContext(ctx: CanvasRenderingContext2D): void {
     ctx.filter = "none";
+  }
+
+  private cancelActiveDrawing(): void {
+    this.isPainting = false;
+    this.activePath = null;
   }
 
   private renderActiveLine(scale: number): void {
@@ -159,8 +172,7 @@ export class DrawingCanvas {
   };
 
   private handlePointerUp = (): void => {
-    this.isPainting = false;
-    this.activePath = null;
+    this.cancelActiveDrawing();
   };
 
   private handlePointerMove = (event: PointerEvent): void => {

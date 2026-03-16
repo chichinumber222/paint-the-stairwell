@@ -2,7 +2,7 @@ import type { BackgroundCanvas } from "../infrastructure/canvas/background";
 import type { DrawingCanvas } from "../infrastructure/canvas/drawing";
 import type { ExportService } from "./export/ExportService";
 import type { ExportState } from "./export/types";
-import type { Options } from "./types";
+import type { Options, Path } from "./types";
 
 export class App {
   private background: BackgroundCanvas;
@@ -64,6 +64,10 @@ export class App {
 
   public setOptions(options: Options): void {
     this.drawing.setOptions(options);
+  }
+
+  public replacePaths(paths: Path[]): void {
+    this.drawing.replacePaths(paths);
   }
 }
 
