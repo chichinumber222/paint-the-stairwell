@@ -23,7 +23,7 @@ const exportStatusElement = document.querySelector("#export-status") as HTMLPara
 
 const defaultOptions: Options = {
   cap: "round",
-  width: 2,
+  width: 3,
   color: "#7e756d",
   brightness: 1,
 };
