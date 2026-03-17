@@ -17,7 +17,7 @@ jobs:
 
       - name: Install dependencies (frontend)
         working-directory: client
-        run: npm ci
+        run: npm install
 
       - name: Lint and format check (frontend)
         working-directory: client
@@ -36,7 +36,7 @@ jobs:
 
       - name: Install dependencies (frontend)
         working-directory: client
-        run: npm ci
+        run: npm install
 
       - name: Build (frontend)
         working-directory: client
