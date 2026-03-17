@@ -24,7 +24,7 @@ $manifest = json_decode($manifestJsonFile);
       <canvas id="drawing-canvas"></canvas>
       <div id="export-controls">
         <p id="export-status" tabindex="-1" hidden></p>
-        <button id="export-button">Expooort</button>
+        <button id="export-button">Export</button>
       </div>
     </div>
     <?php 
