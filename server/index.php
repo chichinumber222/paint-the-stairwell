@@ -1,19 +1,4 @@
-<?php 
-function isMobile() {
-  $userAgent = $_SERVER['HTTP_USER_AGENT'];
-  $mobileAgents = ['Mobile', 'Android', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 'Windows Phone'];
-  foreach ($mobileAgents as $agent) {
-    if (stripos($userAgent, $agent) !== false) {
-      return true;
-    }
-  }
-  return false;
-};
-if (isMobile()) {
-  echo "Mobile devices are not supported. Please use a desktop browser.";
-  exit();
-}
-
+<?php
 $manifestJsonFile = file_get_contents('manifest.json');
 $manifest = json_decode($manifestJsonFile);
 ?>
