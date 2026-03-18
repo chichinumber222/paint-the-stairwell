@@ -7,6 +7,7 @@ export class DrawingCanvas {
   private scale = 1;
   private paths: Path[] = [];
   private activePath: Path | null = null;
+  private activePointerId: number | null = null;
   private isPainting = false;
 
   public constructor(canvas: HTMLCanvasElement, options: Options) {
@@ -83,6 +84,7 @@ export class DrawingCanvas {
   private cancelActiveDrawing(): void {
     this.isPainting = false;
     this.activePath = null;
+    this.activePointerId = null;
   }
 
   private renderActiveLine(scale: number): void {
@@ -149,9 +151,15 @@ export class DrawingCanvas {
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
+    if (this.activePointerId !== null) {
+      return;
+    }
+
     const scale = this.scale;
 
     this.isPainting = true;
+
+    this.activePointerId = event.pointerId;
 
     const canvasPoint = this.getCanvasPoint(event);
     const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
@@ -167,12 +175,20 @@ export class DrawingCanvas {
     this.renderActiveLine(scale);
   };
 
-  private handlePointerUp = (): void => {
+  private handlePointerUp = (event: PointerEvent): void => {
+    if (this.activePointerId !== event.pointerId) {
+      return;
+    }
     this.cancelActiveDrawing();
   };
 
   private handlePointerMove = (event: PointerEvent): void => {
-    if (!this.isPainting || !this.activePath) {
+    if (
+      !this.isPainting ||
+      this.activePath === null ||
+      this.activePointerId === null ||
+      this.activePointerId !== event.pointerId
+    ) {
       return;
     }
 
