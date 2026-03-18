@@ -14,10 +14,12 @@
     "prepare": "cd .. && husky client/.husky"
   },
   "dependencies": {
-    "lil-gui": "^0.18.0"
+    "lil-gui": "^0.18.0",
+    "upng-js": "^2.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/upng-js": "^2.1.5",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.4.0",

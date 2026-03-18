@@ -1,4 +1,5 @@
 import type { ExportConfig, ExportState, ExportStateListener } from "./types";
+import UPNG from "upng-js";
 
 export class ExportService {
   private state: ExportState = {
@@ -51,7 +52,17 @@ export class ExportService {
 
       config.renderExportContent(finalContext, exportScale);
 
-      const dataUrl = finalCanvas.toDataURL("image/png");
+      const imageData = finalContext.getImageData(0, 0, finalCanvas.width, finalCanvas.height);
+      const pngBinary = UPNG.encode(
+        [imageData.data.buffer],
+        finalCanvas.width,
+        finalCanvas.height,
+        0,
+      );
+
+      const blob = new Blob([pngBinary], { type: "image/png" });
+      const dataUrl = URL.createObjectURL(blob);
+
       const link = document.createElement("a");
       link.href = dataUrl;
       link.download = config.fileName;
