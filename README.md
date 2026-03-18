@@ -8,4 +8,4 @@
 
 ## Demo
 
-[stairwell-by-chichi.ru](http://stairwell-by-chichi.ru/)
+[stairwell-by-chichi.ru](https://stairwell-by-chichi.ru)
