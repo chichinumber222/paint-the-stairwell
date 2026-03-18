@@ -202,15 +202,24 @@ export class DrawingCanvas {
     this.renderActiveLine(scale);
   };
 
+  private handlePointerCancel = (event: PointerEvent): void => {
+    if (this.activePointerId !== event.pointerId) {
+      return;
+    }
+    this.cancelActiveDrawing();
+  };
+
   public init(): void {
     this.canvas.addEventListener("pointerdown", this.handlePointerDown);
     this.canvas.addEventListener("pointerup", this.handlePointerUp);
     this.canvas.addEventListener("pointermove", this.handlePointerMove);
+    this.canvas.addEventListener("pointercancel", this.handlePointerCancel);
   }
 
   public destroy(): void {
     this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointermove", this.handlePointerMove);
+    this.canvas.removeEventListener("pointercancel", this.handlePointerCancel);
   }
 }
