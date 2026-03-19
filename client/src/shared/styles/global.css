@@ -31,6 +31,15 @@ body {
 
 #drawing-canvas {
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#app,
+#background-canvas,
+#drawing-canvas {
+  -webkit-tap-highlight-color: transparent;
 }
 
 #export-control {
