@@ -16,7 +16,7 @@ $manifest = json_decode($manifestJsonFile);
         echo ("<link rel='stylesheet' href='{$css_href}'></link>");
     }
     ?>
-    <title>stairwell</title>
+    <title>Stairwell</title>
   </head>
   <body>
     <div id="app">

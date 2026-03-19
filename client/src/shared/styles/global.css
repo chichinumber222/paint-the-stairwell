@@ -11,6 +11,9 @@ body {
   overflow: hidden;
   position: relative;
   background-color: #000;
+  cursor:
+    url("../assets/brush_cursor_icon.png") 0 24,
+    pointer;
 }
 
 #background-canvas,
