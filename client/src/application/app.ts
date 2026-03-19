@@ -68,12 +68,14 @@ export class App {
     this.drawing.setInitialPaths(data);
   }
 
-  public undoControl(): void {
+  public handleUndo(): void {
     this.drawing.deleteLastUserPath();
+    this.renderAll();
   }
 
-  public deleteControl(): void {
+  public handleDeleteAll(): void {
     this.drawing.clearUserPaths();
+    this.renderAll();
   }
 }
 

@@ -80,13 +80,14 @@ export class DrawingCanvas {
     ctx.filter = "none";
   }
 
-  private cancelActiveDrawing(): void {
+  private cancelUserActiveDrawing(): void {
     this.isPainting = false;
     this.userActivePath = null;
     this.userActivePointerId = null;
   }
 
   public deleteLastUserPath(): void {
+    this.cancelUserActiveDrawing();
     if (this.userPaths.length === 0) {
       return;
     }
@@ -94,6 +95,7 @@ export class DrawingCanvas {
   }
 
   public clearUserPaths(): void {
+    this.cancelUserActiveDrawing();
     this.userPaths = [];
   }
 
@@ -192,7 +194,7 @@ export class DrawingCanvas {
     if (this.userActivePointerId !== event.pointerId) {
       return;
     }
-    this.cancelActiveDrawing();
+    this.cancelUserActiveDrawing();
   };
 
   private handlePointerMove = (event: PointerEvent): void => {
@@ -217,7 +219,7 @@ export class DrawingCanvas {
     if (this.userActivePointerId !== event.pointerId) {
       return;
     }
-    this.cancelActiveDrawing();
+    this.cancelUserActiveDrawing();
   };
 
   public init(): void {

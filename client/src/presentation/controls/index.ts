@@ -16,14 +16,8 @@ export class Controls {
   }
 
   public init(): () => void {
-    const onClickUndo = () => {
-      this.app.undoControl();
-      this.app.syncAndRender();
-    };
-    const onClickDelete = () => {
-      this.app.deleteControl();
-      this.app.syncAndRender();
-    };
+    const onClickUndo = () => this.app.handleUndo();
+    const onClickDelete = () => this.app.handleDeleteAll();
 
     this.undoButtonElement.addEventListener("click", onClickUndo);
     this.deleteButtonElement.addEventListener("click", onClickDelete);
