@@ -1,6 +1,6 @@
 import type App from "../../application/app";
 
-export class WindowLifecycleBinder {
+export class WindowLifecycle {
   private app: App;
 
   constructor(app: App) {
@@ -10,7 +10,7 @@ export class WindowLifecycleBinder {
   public setPreloadedData(): void {
     const data = window.__PRELOADED_STATE__;
     if (!data || !data.paths) return;
-    this.app.replacePaths(data.paths);
+    this.app.setInitialData(data.paths);
   }
 
   public init(): () => void {

@@ -5,9 +5,10 @@ export class DrawingCanvas {
   private ctx: CanvasRenderingContext2D;
   private options: Options;
   private scale = 1;
-  private paths: Path[] = [];
-  private activePath: Path | null = null;
-  private activePointerId: number | null = null;
+  private initialPaths: Path[] = [];
+  private userPaths: Path[] = [];
+  private userActivePath: Path | null = null;
+  private userActivePointerId: number | null = null;
   private isPainting = false;
 
   public constructor(canvas: HTMLCanvasElement, options: Options) {
@@ -35,9 +36,8 @@ export class DrawingCanvas {
     this.canvas.height = height;
   }
 
-  public replacePaths(paths: Path[]): void {
-    this.cancelActiveDrawing();
-    this.paths = paths.map((path) => ({
+  public setInitialPaths(paths: Path[]): void {
+    this.initialPaths = paths.map((path) => ({
       points: path.points,
       options: { ...path.options },
     }));
@@ -45,7 +45,6 @@ export class DrawingCanvas {
 
   private getCanvasPoint(event: PointerEvent): Point {
     const rect = this.canvas.getBoundingClientRect();
-
     return {
       x: event.clientX - rect.left,
       y: event.clientY - rect.top,
@@ -83,26 +82,37 @@ export class DrawingCanvas {
 
   private cancelActiveDrawing(): void {
     this.isPainting = false;
-    this.activePath = null;
-    this.activePointerId = null;
+    this.userActivePath = null;
+    this.userActivePointerId = null;
   }
 
-  private renderActiveLine(scale: number): void {
-    if (!this.activePath || this.activePath.points.length === 0) {
+  public deleteLastUserPath(): void {
+    if (this.userPaths.length === 0) {
+      return;
+    }
+    this.userPaths.pop();
+  }
+
+  public clearUserPaths(): void {
+    this.userPaths = [];
+  }
+
+  private renderUserActiveLine(): void {
+    if (!this.userActivePath || this.userActivePath.points.length === 0) {
       return;
     }
 
-    this.applyPathOptionsToContext(this.ctx, this.activePath, scale);
+    this.applyPathOptionsToContext(this.ctx, this.userActivePath, this.scale);
 
     this.ctx.beginPath();
 
-    const lastIndex = this.activePath.points.length - 1;
+    const lastIndex = this.userActivePath.points.length - 1;
 
     const fromPoint = this.toCanvasPoint(
-      this.activePath.points[lastIndex - 1] || this.activePath.points[lastIndex],
-      scale,
+      this.userActivePath.points[lastIndex - 1] || this.userActivePath.points[lastIndex],
+      this.scale,
     );
-    const toPoint = this.toCanvasPoint(this.activePath.points[lastIndex], scale);
+    const toPoint = this.toCanvasPoint(this.userActivePath.points[lastIndex], this.scale);
 
     this.ctx.moveTo(fromPoint.x, fromPoint.y);
     this.ctx.lineTo(toPoint.x, toPoint.y);
@@ -114,11 +124,16 @@ export class DrawingCanvas {
 
   public render(): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.renderTo(this.ctx, this.scale);
+    this.renderImage(this.ctx, this.scale);
   }
 
-  public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
-    for (const path of this.paths) {
+  public renderImage(ctx: CanvasRenderingContext2D, scale: number): void {
+    this.renderPaths(ctx, this.initialPaths, scale);
+    this.renderPaths(ctx, this.userPaths, scale);
+  }
+
+  private renderPaths(ctx: CanvasRenderingContext2D, paths: Path[], scale: number): void {
+    for (const path of paths) {
       if (path.points.length === 0) {
         continue;
       }
@@ -151,32 +166,30 @@ export class DrawingCanvas {
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
-    if (this.activePointerId !== null) {
+    if (this.userActivePointerId !== null) {
       return;
     }
 
-    const scale = this.scale;
-
     this.isPainting = true;
 
-    this.activePointerId = event.pointerId;
+    this.userActivePointerId = event.pointerId;
 
     const canvasPoint = this.getCanvasPoint(event);
-    const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
+    const logicalPoint = this.toLogicalPoint(canvasPoint, this.scale);
 
     const createdPath: Path = {
       points: [logicalPoint],
       options: { ...this.options },
     };
 
-    this.activePath = createdPath;
-    this.paths.push(createdPath);
+    this.userActivePath = createdPath;
+    this.userPaths.push(createdPath);
 
-    this.renderActiveLine(scale);
+    this.renderUserActiveLine();
   };
 
   private handlePointerUp = (event: PointerEvent): void => {
-    if (this.activePointerId !== event.pointerId) {
+    if (this.userActivePointerId !== event.pointerId) {
       return;
     }
     this.cancelActiveDrawing();
@@ -185,25 +198,23 @@ export class DrawingCanvas {
   private handlePointerMove = (event: PointerEvent): void => {
     if (
       !this.isPainting ||
-      this.activePath === null ||
-      this.activePointerId === null ||
-      this.activePointerId !== event.pointerId
+      this.userActivePath === null ||
+      this.userActivePointerId === null ||
+      this.userActivePointerId !== event.pointerId
     ) {
       return;
     }
 
-    const scale = this.scale;
-
     const canvasPoint = this.getCanvasPoint(event);
-    const logicalPoint = this.toLogicalPoint(canvasPoint, scale);
+    const logicalPoint = this.toLogicalPoint(canvasPoint, this.scale);
 
-    this.activePath.points.push(logicalPoint);
+    this.userActivePath.points.push(logicalPoint);
 
-    this.renderActiveLine(scale);
+    this.renderUserActiveLine();
   };
 
   private handlePointerCancel = (event: PointerEvent): void => {
-    if (this.activePointerId !== event.pointerId) {
+    if (this.userActivePointerId !== event.pointerId) {
       return;
     }
     this.cancelActiveDrawing();

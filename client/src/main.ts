@@ -6,9 +6,10 @@ import type { Options } from "./infrastructure/canvas/drawing/types";
 import { ErrorGuard } from "./infrastructure/error-boundary";
 import App from "./application/app";
 import { ExportService } from "./application/export/ExportService";
-import { WindowLifecycleBinder } from "./presentation/windowLifecycleBinder";
-import { OptionsControlPanel } from "./presentation/optionsControlPanel";
-import { ExportControlsBinder } from "./presentation/exportBinder";
+import { WindowLifecycle } from "./presentation/windowLifecycle";
+import { OptionsPanel } from "./presentation/optionsPanel";
+import { ExportControl } from "./presentation/exportControl";
+import { Controls } from "./presentation/controls";
 
 const errorGuard = new ErrorGuard();
 errorGuard.init();
@@ -20,6 +21,9 @@ const drawingCanvasElement = document.querySelector("#app #drawing-canvas") as H
 
 const exportButtonElement = document.querySelector("#export-button") as HTMLButtonElement;
 const exportStatusElement = document.querySelector("#export-status") as HTMLParagraphElement;
+
+const undoButtonElement = document.querySelector("#undo-button") as HTMLButtonElement;
+const deleteButtonElement = document.querySelector("#delete-button") as HTMLButtonElement;
 
 const defaultOptions: Options = {
   cap: "round",
@@ -44,16 +48,15 @@ const app = new App({
 });
 
 // presentation
-const windowLifecycleBinder = new WindowLifecycleBinder(app);
-windowLifecycleBinder.setPreloadedData();
-windowLifecycleBinder.init();
+const windowLifecycle = new WindowLifecycle(app);
+windowLifecycle.setPreloadedData();
+windowLifecycle.init();
 
-const exportControlsBinder = new ExportControlsBinder(
-  app,
-  exportButtonElement,
-  exportStatusElement,
-);
-exportControlsBinder.init();
+const exportControl = new ExportControl(app, exportButtonElement, exportStatusElement);
+exportControl.init();
 
-const optionsControlPanel = new OptionsControlPanel(app, defaultOptions);
-optionsControlPanel.init();
+const optionsPanel = new OptionsPanel(app, defaultOptions);
+optionsPanel.init();
+
+const controls = new Controls(app, undoButtonElement, deleteButtonElement);
+controls.init();

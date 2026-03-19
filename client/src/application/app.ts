@@ -54,8 +54,8 @@ export class App {
       fileName: "stairwell.png",
       getExportSize: () => this.background.getOriginalImageSize(),
       renderExportContent: (ctx, scale) => {
-        this.background.renderTo(ctx, scale);
-        this.drawing.renderTo(ctx, scale);
+        this.background.renderImage(ctx, scale);
+        this.drawing.renderImage(ctx, scale);
       },
     });
   }
@@ -64,8 +64,16 @@ export class App {
     this.drawing.setOptions(options);
   }
 
-  public replacePaths(paths: Path[]): void {
-    this.drawing.replacePaths(paths);
+  public setInitialData(data: Path[]): void {
+    this.drawing.setInitialPaths(data);
+  }
+
+  public undoControl(): void {
+    this.drawing.deleteLastUserPath();
+  }
+
+  public deleteControl(): void {
+    this.drawing.clearUserPaths();
   }
 }
 

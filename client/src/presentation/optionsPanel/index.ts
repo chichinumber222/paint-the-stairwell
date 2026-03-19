@@ -2,7 +2,7 @@ import type { App } from "../../application/app";
 import GUI from "lil-gui";
 import type { Options } from "../../application/types";
 
-export class OptionsControlPanel {
+export class OptionsPanel {
   private app: App;
   private gui: GUI | null = null;
   private options: Options = {};

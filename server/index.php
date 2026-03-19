@@ -22,9 +22,13 @@ $manifest = json_decode($manifestJsonFile);
     <div id="app">
       <canvas id="background-canvas"></canvas>
       <canvas id="drawing-canvas"></canvas>
-      <div id="export-controls">
+      <div id="export-control">
         <p id="export-status" tabindex="-1" hidden></p>
         <button id="export-button">Export</button>
+      </div>
+      <div id="controls">
+        <button id="undo-button">Undo</button>
+        <button id="delete-button">Delete</button>
       </div>
     </div>
     <?php 

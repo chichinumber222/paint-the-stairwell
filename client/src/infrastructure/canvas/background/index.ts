@@ -53,10 +53,10 @@ export class BackgroundCanvas {
 
   public render(): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.renderTo(this.ctx, this.scale);
+    this.renderImage(this.ctx, this.scale);
   }
 
-  public renderTo(ctx: CanvasRenderingContext2D, scale: number): void {
+  public renderImage(ctx: CanvasRenderingContext2D, scale: number): void {
     if (!this.image) {
       throw new Error("Cannot render background: image is not loaded.");
     }

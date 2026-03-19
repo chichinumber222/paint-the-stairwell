@@ -1,6 +1,6 @@
 import type App from "../../application/app";
 
-export class ExportControlsBinder {
+export class ExportControl {
   private app: App;
   private exportButtonElement: HTMLButtonElement;
   private exportStatusElement: HTMLParagraphElement;
