@@ -1,6 +1,7 @@
 <?php
-$manifestJsonFile = file_get_contents('manifest.json');
+$manifestJsonFile = file_get_contents('builder/manifest.json');
 $manifest = json_decode($manifestJsonFile);
+$builderSrc = "index.html";
 ?>
 <!doctype html>
 <html lang="en">
@@ -8,13 +9,16 @@ $manifest = json_decode($manifestJsonFile);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <?php
-    $css_href_array = $manifest->{"index.html"}->css;
+    $css_href_array = $manifest->{$builderSrc}->css;
     if (!is_array($css_href_array)) {
         $css_href_array = [$css_href_array];
     }
     foreach ($css_href_array as $css_href) {
         echo ("<link rel='stylesheet' href='{$css_href}'></link>");
     }
+    ?>
+    <?php
+    echo ("<link rel='manifest' href='manifest.webmanifest'></link>");
     ?>
     <title>Stairwell</title>
   </head>
@@ -45,7 +49,7 @@ $manifest = json_decode($manifestJsonFile);
       echo "<script>window.__PRELOADED_STATE__  = " . json_encode(['paths' => $paths], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) . ";</script>";
     ?>
     <?php
-    $js_src_array = $manifest->{"index.html"}->file;
+    $js_src_array = $manifest->{$builderSrc}->file;
     if (!is_array($js_src_array)) {
         $js_src_array = [$js_src_array];
     }

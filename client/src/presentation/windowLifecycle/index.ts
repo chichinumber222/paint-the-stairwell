@@ -1,10 +1,17 @@
 import type App from "../../application/app";
+import { registerSW } from "virtual:pwa-register";
 
 export class WindowLifecycle {
   private app: App;
 
   constructor(app: App) {
     this.app = app;
+  }
+
+  public registerServiceWorker(): void {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => registerSW());
+    }
   }
 
   public setPreloadedData(): void {

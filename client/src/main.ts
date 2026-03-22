@@ -50,6 +50,7 @@ const app = new App({
 // presentation
 const windowLifecycle = new WindowLifecycle(app);
 windowLifecycle.setPreloadedData();
+windowLifecycle.registerServiceWorker(); // PWA
 windowLifecycle.init();
 
 const exportControl = new ExportControl(app, exportButtonElement, exportStatusElement);
